@@ -1,22 +1,26 @@
-# app_ui.py
 import streamlit as st
 from transformers import pipeline
 
-# Load sentiment analysis model
-sentiment_model = pipeline("sentiment-analysis")
+# Load pre-trained sentiment-analysis model using CPU
+sentiment_model = pipeline("sentiment-analysis", device=-1)
 
-# UI
+def predict_sentiment(text):
+    result = sentiment_model(text)
+    sentiment = result[0]['label']
+    score = result[0]['score']
+    return sentiment, score
+
+# Streamlit UI
 st.title("Real-Time Sentiment Analysis")
-st.write("Enter a sentence to analyze its sentiment:")
+st.subheader("Enter your text to get sentiment analysis:")
 
-user_input = st.text_area("Text Input", height=150)
+user_input = st.text_area("Input Text")
 
-if st.button("Analyze"):
-    if user_input.strip():
-        result = sentiment_model(user_input)[0]
-        sentiment = result['label']
-        score = result['score']
-        st.write(f"### Sentiment: {sentiment}")
-        st.write(f"### Confidence: {score:.2f}")
+if st.button("Analyze Sentiment"):
+    if user_input:
+        sentiment, score = predict_sentiment(user_input)
+        st.success(f"Sentiment: {sentiment}")
+        st.info(f"Confidence Score: {score:.2f}")
     else:
         st.warning("Please enter some text to analyze.")
+
