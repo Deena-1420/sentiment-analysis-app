@@ -1,9 +1,14 @@
 import streamlit as st
 from transformers import pipeline
 
-# Load pre-trained sentiment-analysis model using CPU
-sentiment_model = pipeline("sentiment-analysis", device=-1)
+# Load pre-trained sentiment-analysis model using cache
+@st.cache_resource
+def load_model():
+    return pipeline("sentiment-analysis", device=-1)
 
+sentiment_model = load_model()
+
+# Function to predict sentiment
 def predict_sentiment(text):
     result = sentiment_model(text)
     sentiment = result[0]['label']
@@ -23,4 +28,3 @@ if st.button("Analyze Sentiment"):
         st.info(f"Confidence Score: {score:.2f}")
     else:
         st.warning("Please enter some text to analyze.")
-
